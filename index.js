@@ -1,5 +1,7 @@
 import { createInterface } from 'readline/promises';
 import { homedir } from 'os';
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
 
 const readline = createInterface({
   input: process.stdin,
@@ -8,7 +10,7 @@ const readline = createInterface({
 
 async function run() {
   console.log(`Welcome to the File Manager, ${getUserName(process.argv)}!`)
-  console.log(`You are currently in ${getHomeDir()}`)
+  console.log(`You are currently in ${setHomeDir()}`)
   console.log('Please, enter the command')
   while (true) {
     const command = await readline.question('')
@@ -33,6 +35,7 @@ function getUserName(args) {
   return 'No Name'
 }
 
-function getHomeDir() {
-  return homedir();
+function setHomeDir() {
+  process.chdir(homedir());
+  return process.cwd();
 }
