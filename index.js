@@ -18,6 +18,9 @@ async function run() {
       readline.question(`Thank you for using File Manager, ${getUserName(process.argv)}, goodbye! \n`)
       process.exit()
     }
+    if (command.trim() === 'up') {
+      goUpper()
+    }
     else {
       console.log('Invalid input. Try another command')
     }
@@ -38,4 +41,10 @@ function getUserName(args) {
 function setHomeDir() {
   process.chdir(homedir());
   return process.cwd();
+}
+
+function goUpper() {
+  const curDir = process.cwd();
+  process.chdir(dirname(curDir));
+  console.log(process.cwd())
 }
