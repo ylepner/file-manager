@@ -1,6 +1,6 @@
 import { createInterface } from 'readline/promises';
 import { homedir } from 'os';
-import { dirname } from 'path';
+import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 
 const readline = createInterface({
@@ -20,6 +20,10 @@ async function run() {
     }
     if (command.trim() === 'up') {
       goUpper()
+      continue
+    }
+    if (command.slice(0, 3) === 'cd ') {
+      changeDir(command.slice(3))
     }
     else {
       console.log('Invalid input. Try another command')
@@ -46,5 +50,32 @@ function setHomeDir() {
 function goUpper() {
   const curDir = process.cwd();
   process.chdir(dirname(curDir));
-  console.log(process.cwd())
+  printCurrDir();
+}
+
+function changeDir(input) {
+  const path = join(process.cwd(), input)
+  try {
+    if (isExists(path)) {
+      process.chdir(path);
+      printCurrDir()
+    }
+  }
+  catch {
+    console.log('Operation failed. Try again');
+    printCurrDir()
+  }
+}
+
+async function isExists(dir) {
+  try {
+    await stat(dir)
+    return true
+  } catch {
+    return false
+  }
+}
+
+function printCurrDir() {
+  console.log(`You are currently in ${process.cwd()}`)
 }
