@@ -3,6 +3,9 @@ import { homedir } from 'os';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { chdir } from 'process';
+import { readdir } from 'fs/promises';
+import { lstat } from 'fs/promises';
+
 
 const readline = createInterface({
   input: process.stdin,
@@ -25,6 +28,11 @@ async function run() {
     }
     if (command.slice(0, 3) === 'cd ') {
       changeDir(command.slice(3))
+      continue
+    }
+    if (command.trim() === 'ls') {
+      printLs()
+      continue
     }
     else {
       console.log('Invalid input. Try another command')
@@ -66,4 +74,20 @@ function changeDir(input) {
 
 function printCurrDir() {
   console.log(`You are currently in ${process.cwd()}`)
+}
+
+async function printLs() {
+  const files = await readdir(process.cwd(), { withFileTypes: true });
+  const resultFiles = [];
+  const resultDirectories = [];
+  for (const file of files) {
+    if (file.isFile()) {
+      resultFiles.push(`${file.name} | type: file`)
+    } else {
+      resultDirectories.push(`${file.name} | type: directory`)
+    }
+  }
+  const sortedFilesArray = resultFiles.sort((str1, str2) => str1.localeCompare(str2));
+  const sortedDirectoriesArray = resultDirectories.sort((str1, str2) => str1.localeCompare(str2))
+  console.log([...sortedDirectoriesArray, ...sortedFilesArray])
 }
