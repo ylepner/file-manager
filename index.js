@@ -1,11 +1,9 @@
 import { createInterface } from 'readline/promises';
 import { homedir } from 'os';
-import { dirname } from 'path';
+import { dirname, join, basename } from 'path';
 import { chdir } from 'process';
-import { readdir, rename } from 'fs/promises';
-import { createReadStream } from 'fs';
-import { pipeline } from 'stream';
-import { promisify } from 'util';
+import { readdir, rename, stat } from 'fs/promises';
+import { createReadStream, createWriteStream } from 'fs';
 
 
 
@@ -38,6 +36,9 @@ async function run() {
     }
     else if (command.slice(0, 2) === 'rn') {
       renameFile(command.slice(3))
+    }
+    else if (command.slice(0, 2) === 'cp') {
+      await copyFile(command.slice(3))
     }
     else {
       console.log('Invalid input. Try another command')
@@ -115,6 +116,35 @@ async function renameFile(string) {
   try {
     await rename(currName, newName)
   } catch {
-    throw new Error('FS operation failed')
+    throw new Error('Operation failed. Try again')
+  }
+}
+
+async function copyFile(string) {
+  const arr = string.split(' ');
+  const file = arr[0];
+  const path = join(arr[1], basename(arr[0]));
+  if (await isExist(file)) {
+    try {
+      const readStream = createReadStream(file);
+      const writeStream = createWriteStream(path);
+      readStream.pipe(writeStream);
+      console.log(`Done! ${file} has been copied to ${path}`)
+    }
+    catch {
+      console.log('Operation failed. Try again')
+    }
+  }
+  else {
+    console.log('No file. Try again')
+  }
+}
+
+async function isExist(dir) {
+  try {
+    await stat(dir)
+    return true
+  } catch {
+    return false
   }
 }
