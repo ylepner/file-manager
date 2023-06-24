@@ -2,8 +2,10 @@ import { createInterface } from 'readline/promises';
 import { homedir } from 'os';
 import { dirname } from 'path';
 import { chdir } from 'process';
-import { readdir } from 'fs/promises';
+import { readdir, rename } from 'fs/promises';
 import { createReadStream } from 'fs';
+import { pipeline } from 'stream';
+import { promisify } from 'util';
 
 
 
@@ -24,26 +26,23 @@ async function run() {
     }
     if (command.trim() === 'up') {
       goUpper()
-      continue
     }
-    if (command.slice(0, 2) === 'cd') {
+    else if (command.slice(0, 2) === 'cd') {
       changeDir(command.slice(3))
-      continue
     }
-    if (command.trim() === 'ls') {
+    else if (command.trim() === 'ls') {
       printLs()
-      continue
     }
-    if (command.slice(0, 3) === 'cat') {
+    else if (command.slice(0, 3) === 'cat') {
       readFile(command.slice(4))
-      continue
     }
-    if (command.slice(0, 2) === 'rn') {
-      renameFile(string)
+    else if (command.slice(0, 2) === 'rn') {
+      renameFile(command.slice(3))
     }
     else {
       console.log('Invalid input. Try another command')
     }
+    printCurrDir();
   }
 }
 
@@ -66,16 +65,13 @@ function setHomeDir() {
 function goUpper() {
   const curDir = process.cwd();
   process.chdir(dirname(curDir));
-  printCurrDir();
 }
 
 function changeDir(input) {
   try {
     chdir(input)
-    printCurrDir()
   } catch {
     console.log('Operation failed. Try again')
-    printCurrDir()
   }
 }
 
@@ -100,16 +96,25 @@ async function printLs() {
 }
 
 function readFile(file) {
-  const stream = createReadStream(file);
-  stream.on('error', (error) => {
-    if (error) {
-      console.log('Operation failed. Try again');
-      return;
-    }
-  });
-  stream.pipe(process.stdout);
-  stream.on('end', () => {
-    console.log('\n');
-    printCurrDir();
-  });
+  return new Promise((resolve, reject) => {
+    const stream = createReadStream(file);
+    stream.on('error', (error) => {
+      reject(error)
+    });
+    stream.pipe(process.stdout);
+    stream.on('end', () => {
+      resolve('success')
+    });
+  })
+}
+
+async function renameFile(string) {
+  const filesArr = string.split(' ');
+  const currName = filesArr[0];
+  const newName = filesArr[1];
+  try {
+    await rename(currName, newName)
+  } catch {
+    throw new Error('FS operation failed')
+  }
 }
