@@ -2,7 +2,7 @@ import { createInterface } from 'readline/promises';
 import { homedir } from 'os';
 import { dirname, join, basename } from 'path';
 import { chdir } from 'process';
-import { readdir, rename, stat } from 'fs/promises';
+import { readdir, rename, stat, unlink } from 'fs/promises';
 import { createReadStream, createWriteStream } from 'fs';
 
 
@@ -39,6 +39,12 @@ async function run() {
     }
     else if (command.slice(0, 2) === 'cp') {
       await copyFile(command.slice(3))
+    }
+    // else if (command.slice(0, 2) === 'mv') {
+    //   await moveFile(command.slice(3));
+    // }
+    else if (command.slice(0, 2) === 'rm') {
+      await deleteFile(command.slice(3))
     }
     else {
       console.log('Invalid input. Try another command')
@@ -146,5 +152,20 @@ async function isExist(dir) {
     return true
   } catch {
     return false
+  }
+}
+
+// function moveFile(string) {
+//   copyFile(string);
+//   const arr = string.split(' ');
+//   const file = arr[0];
+//   const path = join(arr[1], basename(arr[0]));
+// }
+
+async function deleteFile(file) {
+  try {
+    await unlink(file)
+  } catch {
+    console.log('Operation failed. Try again')
   }
 }
