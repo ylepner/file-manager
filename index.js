@@ -1,10 +1,10 @@
 import { createInterface } from 'readline/promises';
 import { homedir } from 'os';
-import { dirname, join } from 'path';
-import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 import { chdir } from 'process';
 import { readdir } from 'fs/promises';
-import { lstat } from 'fs/promises';
+import { createReadStream } from 'fs';
+
 
 
 const readline = createInterface({
@@ -26,13 +26,20 @@ async function run() {
       goUpper()
       continue
     }
-    if (command.slice(0, 3) === 'cd ') {
+    if (command.slice(0, 2) === 'cd') {
       changeDir(command.slice(3))
       continue
     }
     if (command.trim() === 'ls') {
       printLs()
       continue
+    }
+    if (command.slice(0, 3) === 'cat') {
+      readFile(command.slice(4))
+      continue
+    }
+    if (command.slice(0, 2) === 'rn') {
+      renameFile(string)
     }
     else {
       console.log('Invalid input. Try another command')
@@ -90,4 +97,19 @@ async function printLs() {
   const sortedFilesArray = resultFiles.sort((str1, str2) => str1.localeCompare(str2));
   const sortedDirectoriesArray = resultDirectories.sort((str1, str2) => str1.localeCompare(str2))
   console.log([...sortedDirectoriesArray, ...sortedFilesArray])
+}
+
+function readFile(file) {
+  const stream = createReadStream(file);
+  stream.on('error', (error) => {
+    if (error) {
+      console.log('Operation failed. Try again');
+      return;
+    }
+  });
+  stream.pipe(process.stdout);
+  stream.on('end', () => {
+    console.log('\n');
+    printCurrDir();
+  });
 }
