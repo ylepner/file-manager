@@ -45,7 +45,9 @@ async function run() {
       })
     }
     else if (command.slice(0, 2) === 'mv') {
-      await moveFile(command.slice(3));
+      await runCommand(() => moveFile(command.slice(3)), 'Done! File has been moved', () => {
+        console.log('Operation failed. Try again')
+      })
     }
     else if (command.slice(0, 2) === 'rm') {
       await runCommand(() => deleteFile(command.slice(3)), 'Done! File has been deleted', () => {
