@@ -6,6 +6,7 @@ import { readdir, rename, stat, unlink } from 'fs/promises';
 import { createReadStream, createWriteStream } from 'fs';
 import { pipeline } from 'stream';
 import { promisify } from 'util';
+import { getCPUs, getOEL } from './os-commands.js';
 
 
 
@@ -53,6 +54,14 @@ async function run() {
       await runCommand(() => deleteFile(command.slice(3)), 'Done! File has been deleted', () => {
         console.log('Operation failed. Try again')
       })
+    }
+    else if (command.slice(0, 2) === 'os') {
+      if (command.slice(3) === '--EOL') {
+        console.log(getOEL());
+      }
+      if (command.slice(3) === '--cpus') {
+        console.log(getCPUs());
+      }
     }
     else {
       console.log('Invalid input. Try another command')
