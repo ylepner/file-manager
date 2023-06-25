@@ -6,7 +6,7 @@ import { readdir, rename, stat, unlink } from 'fs/promises';
 import { createReadStream, createWriteStream } from 'fs';
 import { pipeline } from 'stream';
 import { promisify } from 'util';
-import { getCPUs, getOEL } from './os-commands.js';
+import { getCPUArchitecture, getCPUs, getHomeDir, getOEL, getSystemUserName } from './os-commands.js';
 
 
 
@@ -59,8 +59,17 @@ async function run() {
       if (command.slice(3) === '--EOL') {
         console.log(getOEL());
       }
-      if (command.slice(3) === '--cpus') {
+      else if (command.slice(3) === '--cpus') {
         console.log(getCPUs());
+      }
+      else if (command.slice(3) === '--homedir') {
+        console.log(getHomeDir());
+      }
+      else if (command.slice(3) === '--username') {
+        console.log(getSystemUserName())
+      }
+      else if (command.slice(3) === '--architecture') {
+        console.log(getCPUArchitecture())
       }
     }
     else {
