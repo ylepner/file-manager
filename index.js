@@ -4,6 +4,8 @@ import { dirname, join, basename } from 'path';
 import { chdir } from 'process';
 import { readdir, rename, stat, unlink } from 'fs/promises';
 import { createReadStream, createWriteStream } from 'fs';
+import { pipeline } from 'stream';
+import { promisify } from 'util';
 
 
 
@@ -29,22 +31,26 @@ async function run() {
       changeDir(command.slice(3))
     }
     else if (command.trim() === 'ls') {
-      printLs()
+      await printLs()
     }
     else if (command.slice(0, 3) === 'cat') {
-      readFile(command.slice(4))
+      await readFile(command.slice(4))
     }
     else if (command.slice(0, 2) === 'rn') {
       renameFile(command.slice(3))
     }
     else if (command.slice(0, 2) === 'cp') {
-      await copyFile(command.slice(3))
+      await runCommand(() => copyFile(command.slice(3)), 'Done! File has been copied', () => {
+        console.log('Operation failed. Try again')
+      })
     }
-    // else if (command.slice(0, 2) === 'mv') {
-    //   await moveFile(command.slice(3));
-    // }
+    else if (command.slice(0, 2) === 'mv') {
+      await moveFile(command.slice(3));
+    }
     else if (command.slice(0, 2) === 'rm') {
-      await deleteFile(command.slice(3))
+      await runCommand(() => deleteFile(command.slice(3)), 'Done! File has been deleted', () => {
+        console.log('Operation failed. Try again')
+      })
     }
     else {
       console.log('Invalid input. Try another command')
@@ -54,6 +60,15 @@ async function run() {
 }
 
 await run();
+
+async function runCommand(toRun, successMessage, whenError) {
+  try {
+    await toRun()
+    console.log(successMessage)
+  } catch (e) {
+    whenError(e)
+  }
+}
 
 function getUserName(args) {
   const key = '--username=';
@@ -102,7 +117,7 @@ async function printLs() {
   console.log([...sortedDirectoriesArray, ...sortedFilesArray])
 }
 
-function readFile(file) {
+async function readFile(file) {
   return new Promise((resolve, reject) => {
     const stream = createReadStream(file);
     stream.on('error', (error) => {
@@ -110,6 +125,7 @@ function readFile(file) {
     });
     stream.pipe(process.stdout);
     stream.on('end', () => {
+      console.log('\n');
       resolve('success')
     });
   })
@@ -131,18 +147,12 @@ async function copyFile(string) {
   const file = arr[0];
   const path = join(arr[1], basename(arr[0]));
   if (await isExist(file)) {
-    try {
-      const readStream = createReadStream(file);
-      const writeStream = createWriteStream(path);
-      readStream.pipe(writeStream);
-      console.log(`Done! ${file} has been copied to ${path}`)
-    }
-    catch {
-      console.log('Operation failed. Try again')
-    }
-  }
-  else {
-    console.log('No file. Try again')
+    const readStream = createReadStream(file);
+    const writeStream = createWriteStream(path);
+    const pipe = promisify(pipeline);
+    await pipe(readStream, writeStream);
+  } else {
+    throw new Error('No file. Try again')
   }
 }
 
@@ -155,17 +165,13 @@ async function isExist(dir) {
   }
 }
 
-// function moveFile(string) {
-//   copyFile(string);
-//   const arr = string.split(' ');
-//   const file = arr[0];
-//   const path = join(arr[1], basename(arr[0]));
-// }
+async function moveFile(string) {
+  await copyFile(string);
+  const arr = string.split(' ');
+  const file = arr[0];
+  await deleteFile(file);
+}
 
 async function deleteFile(file) {
-  try {
-    await unlink(file)
-  } catch {
-    console.log('Operation failed. Try again')
-  }
+  await unlink(file)
 }
