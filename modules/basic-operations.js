@@ -1,12 +1,13 @@
 
 import { join, basename } from 'path';
-import { rename, unlink } from 'fs/promises';
+import { rename, unlink, writeFile } from 'fs/promises';
 import { createReadStream, createWriteStream } from 'fs';
 import { pipeline } from 'stream';
 import { promisify } from 'util';
 import { parse2Paths } from './input-parser.js';
+import { isExist } from './utils.js';
 
-export async function readUserFile(file) {
+export async function readFile(file) {
   return new Promise((resolve, reject) => {
     const stream = createReadStream(file);
     stream.on('error', (error) => {
@@ -20,14 +21,19 @@ export async function readUserFile(file) {
   })
 }
 
+export async function createFile(fileName) {
+  await writeFile(fileName, '');
+}
+
 export async function renameFile(string) {
-  const filesArr = string.split(' ');
-  const currName = filesArr[0];
-  const newName = filesArr[1];
-  try {
+  const arr = parse2Paths(string)[0];
+  const currName = arr[0];
+  const newName = arr[1];
+  if (isExist(currName)) {
     await rename(currName, newName)
-  } catch {
-    throw new Error('Operation failed. Try again')
+  }
+  else {
+    throw new Error('Error')
   }
 }
 
