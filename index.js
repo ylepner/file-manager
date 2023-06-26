@@ -2,7 +2,7 @@ import { createInterface } from 'readline/promises';
 import { getCPUArchitecture, getCPUs, getHomeDir, getOEL, getSystemUserName } from './modules/os-commands.js';
 import { compress, decompress } from './modules/zip-commands.js';
 import { changeDir, goUpper, printLs } from './modules/nwd-commands.js';
-import { copyFile, createFile, moveFile, readFile, renameFile } from './modules/basic-operations.js';
+import { copyFile, createFile, deleteFile, moveFile, readFile, renameFile } from './modules/basic-operations.js';
 import { getUserName, printCurrDir, printErrMessage, runCommand, setHomeDir } from './modules/utils.js';
 import { calculateHash } from './modules/hash-command.js';
 
@@ -78,9 +78,14 @@ async function run() {
       else if (command.slice(3) === '--architecture') {
         console.log(getCPUArchitecture());
       }
+      else {
+        console.log('Invalid input. Try another OS command');
+      }
     }
     else if (command.slice(0, 4) === 'hash') {
-      calculateHash(command.slice(5));
+      await runCommand(() => calculateHash(command.slice(5)), '', () => {
+        printErrMessage();
+      });
     }
     else if (command.slice(0, 8) === 'compress') {
       await runCommand(() => compress(command.slice(9)), 'Done! File has been compressed', () => {
