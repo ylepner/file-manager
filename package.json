@@ -1,0 +1,16 @@
+{
+  "name": "file-manager",
+  "version": "1.0.0",
+  "description": "This repository is the part of nodejs-assignments https://github.com/AlreadyBored/nodejs-assignments",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ylepner/file-manager.git"
+  },
+  "author": "ylepner",
+  "license": "ISC",
+  "homepage": "https://github.com/ylepner/file-manager#readme"
+}
