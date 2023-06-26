@@ -3,10 +3,8 @@ import { pipeline } from 'stream';
 import { createGzip, createUnzip } from 'zlib';
 import { createReadStream, createWriteStream } from 'fs';
 import { parse2Paths } from './input-parser.js';
-import { isExist } from './index.js';
 import { join } from 'path';
-
-
+import { isExist } from './utils.js';
 
 export async function compress(string) {
   const arr = parse2Paths(string)[0];

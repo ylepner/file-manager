@@ -10,8 +10,3 @@ export function parse2Paths(str) {
   console.log(res)
   return res
 }
-
-// console.log(parse2Paths('asdfa asdfasdf'))
-// console.log(parse2Paths('"C:/folder asdf/asdfas asdf/text text.txt" asdf'))
-// console.log(parse2Paths('asdf "C:/folder asdf/asdfas asdf/text text.txt"'))
-// console.log(parse2Paths('"asdfasdf asdf asdf asdf" "C:/folder asdf/asdfas asdf/text text.txt"'))
