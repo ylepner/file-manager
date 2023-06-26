@@ -11,11 +11,15 @@ const readline = createInterface({
   output: process.stdout
 })
 
+readline.on('SIGINT', () => {
+  console.log(`Thank you for using File Manager, ${getUserName(process.argv)}, goodbye! \n`)
+  readline.close();
+});
+
 async function run() {
   console.log(`Welcome to the File Manager, ${getUserName(process.argv)}!`);
   console.log(`You are currently in ${setHomeDir()}`);
   console.log('Please, enter the command');
-
   while (true) {
     const command = await readline.question('');
     if (command.trim() === '.exit') {
