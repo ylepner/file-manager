@@ -2,13 +2,13 @@ import { createInterface } from 'readline/promises';
 import { homedir } from 'os';
 import { dirname, join, basename } from 'path';
 import { chdir } from 'process';
-import { readdir, rename, stat, unlink } from 'fs/promises';
+import { readdir, rename, stat, unlink, readFile } from 'fs/promises';
 import { createReadStream, createWriteStream } from 'fs';
 import { pipeline } from 'stream';
 import { promisify } from 'util';
 import { getCPUArchitecture, getCPUs, getHomeDir, getOEL, getSystemUserName } from './os-commands.js';
-
-
+import { parse2Paths } from './input-parser.js';
+import { createHash } from 'crypto';
 
 const readline = createInterface({
   input: process.stdin,
@@ -35,7 +35,7 @@ async function run() {
       await printLs()
     }
     else if (command.slice(0, 3) === 'cat') {
-      await readFile(command.slice(4))
+      await readUserFile(command.slice(4))
     }
     else if (command.slice(0, 2) === 'rn') {
       renameFile(command.slice(3))
@@ -71,6 +71,9 @@ async function run() {
       else if (command.slice(3) === '--architecture') {
         console.log(getCPUArchitecture())
       }
+    }
+    else if (command.slice(0, 4) === 'hash') {
+      calculateHash(command.slice(5))
     }
     else {
       console.log('Invalid input. Try another command')
@@ -137,7 +140,7 @@ async function printLs() {
   console.log([...sortedDirectoriesArray, ...sortedFilesArray])
 }
 
-async function readFile(file) {
+async function readUserFile(file) {
   return new Promise((resolve, reject) => {
     const stream = createReadStream(file);
     stream.on('error', (error) => {
@@ -163,7 +166,7 @@ async function renameFile(string) {
 }
 
 async function copyFile(string) {
-  const arr = string.split(' ');
+  const arr = parse2Paths(string)[1];
   const file = arr[0];
   const path = join(arr[1], basename(arr[0]));
   if (await isExist(file)) {
@@ -195,3 +198,8 @@ async function moveFile(string) {
 async function deleteFile(file) {
   await unlink(file)
 }
+
+async function calculateHash(file) {
+  const content = await readFile(file)
+  console.log(createHash('sha256').update(content).digest('hex'));
+};
