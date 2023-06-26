@@ -11,12 +11,12 @@ export async function readFile(file) {
   return new Promise((resolve, reject) => {
     const stream = createReadStream(file);
     stream.on('error', (error) => {
-      reject(error)
+      reject(error);
     });
     stream.pipe(process.stdout);
     stream.on('end', () => {
       console.log('\n');
-      resolve('success')
+      resolve('success');
     });
   })
 }
@@ -30,10 +30,10 @@ export async function renameFile(string) {
   const currName = arr[0];
   const newName = arr[1];
   if (isExist(currName)) {
-    await rename(currName, newName)
+    await rename(currName, newName);
   }
   else {
-    throw new Error('Error')
+    throw new Error('Error');
   }
 }
 
@@ -47,7 +47,7 @@ export async function copyFile(string) {
     const pipe = promisify(pipeline);
     await pipe(readStream, writeStream);
   } else {
-    throw new Error('No file. Try again')
+    throw new Error('No file. Try again');
   }
 }
 
@@ -59,5 +59,5 @@ export async function moveFile(string) {
 }
 
 export async function deleteFile(file) {
-  await unlink(file)
+  await unlink(file);
 }

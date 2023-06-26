@@ -22,12 +22,12 @@ export async function printLs() {
   const resultDirectories = [];
   for (const file of files) {
     if (file.isFile()) {
-      resultFiles.push(`${file.name} | type: file`)
+      resultFiles.push(`${file.name} | type: file`);
     } else {
-      resultDirectories.push(`${file.name} | type: directory`)
+      resultDirectories.push(`${file.name} | type: directory`);
     }
   }
   const sortedFilesArray = resultFiles.sort((str1, str2) => str1.localeCompare(str2));
-  const sortedDirectoriesArray = resultDirectories.sort((str1, str2) => str1.localeCompare(str2))
-  console.log([...sortedDirectoriesArray, ...sortedFilesArray])
+  const sortedDirectoriesArray = resultDirectories.sort((str1, str2) => str1.localeCompare(str2));
+  console.log([...sortedDirectoriesArray, ...sortedFilesArray]);
 }

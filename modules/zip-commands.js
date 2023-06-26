@@ -10,7 +10,7 @@ export async function compress(string) {
   const arr = parse2Paths(string)[0];
   const input = arr[0];
   const destPath = arr[1];
-  const destFilePath = join(destPath, `${input}.br`)
+  const destFilePath = join(destPath, `${input}.br`);
   const pipe = promisify(pipeline);
   if (isExist(input)) {
     const gzip = createGzip();
