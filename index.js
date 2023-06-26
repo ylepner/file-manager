@@ -2,7 +2,7 @@ import { createInterface } from 'readline/promises';
 import { getCPUArchitecture, getCPUs, getHomeDir, getOEL, getSystemUserName } from './modules/os-commands.js';
 import { compress, decompress } from './modules/zip-commands.js';
 import { changeDir, goUpper, printLs } from './modules/nwd-commands.js';
-import { readUserFile, renameFile } from './modules/basic-operations.js';
+import { copyFile, createFile, moveFile, readFile, renameFile } from './modules/basic-operations.js';
 import { getUserName, printCurrDir, printErrMessage, runCommand, setHomeDir } from './modules/utils.js';
 import { calculateHash } from './modules/hash-command.js';
 
@@ -32,10 +32,20 @@ async function run() {
       await printLs();
     }
     else if (command.slice(0, 3) === 'cat') {
-      await readUserFile(command.slice(4));
+      await runCommand(() => readFile(command.slice(4)), 'Done! File has been read', () => {
+        printErrMessage();
+      })
+    }
+    else if (command.slice(0, 3) === 'add') {
+      await runCommand(() => createFile(command.slice(4)), 'Done! File has been created', () => {
+        printErrMessage();
+      });
     }
     else if (command.slice(0, 2) === 'rn') {
-      renameFile(command.slice(3));
+      await runCommand(() => renameFile(command.slice(3)), 'Done! File has been renamed', () => {
+        printErrMessage();
+      })
+        ;
     }
     else if (command.slice(0, 2) === 'cp') {
       await runCommand(() => copyFile(command.slice(3)), 'Done! File has been copied', () => {
