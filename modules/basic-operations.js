@@ -53,7 +53,7 @@ export async function copyFile(string) {
 
 export async function moveFile(string) {
   await copyFile(string);
-  const arr = string.split(' ');
+  const arr = parse2Paths(string)[0];
   const file = arr[0];
   await deleteFile(file);
 }
