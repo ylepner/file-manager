@@ -6,7 +6,9 @@ export function parse2Paths(str) {
     /^"([^"]+)"\s+"([^"]+)"$/
   ]
 
-  return regexes.map(regex => str.match(regex)).filter(x => x?.length === 3).map(x => [x[1], x[2]]);
+  const res = regexes.map(regex => str.match(regex)).filter(x => x?.length === 3).map(x => [x[1], x[2]]);
+  console.log(res)
+  return res
 }
 
 // console.log(parse2Paths('asdfa asdfasdf'))

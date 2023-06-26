@@ -9,6 +9,7 @@ import { promisify } from 'util';
 import { getCPUArchitecture, getCPUs, getHomeDir, getOEL, getSystemUserName } from './os-commands.js';
 import { parse2Paths } from './input-parser.js';
 import { createHash } from 'crypto';
+import { compress } from './zip-commands.js';
 
 const readline = createInterface({
   input: process.stdin,
@@ -74,6 +75,12 @@ async function run() {
     }
     else if (command.slice(0, 4) === 'hash') {
       calculateHash(command.slice(5))
+      printCurrDir()
+    }
+    else if (command.slice(0, 8) === 'compress') {
+      await runCommand(() => compress(command.slice(9)), 'Done! File has been compressed', () => {
+        console.log('Operation failed. Try again')
+      })
     }
     else {
       console.log('Invalid input. Try another command')
@@ -179,7 +186,7 @@ async function copyFile(string) {
   }
 }
 
-async function isExist(dir) {
+export async function isExist(dir) {
   try {
     await stat(dir)
     return true
