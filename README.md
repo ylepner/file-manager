@@ -9,7 +9,7 @@
 ### Finish the program
 > .exit
 
-> ctrl+c
+> keyboard shortcuts 'ctrl+c'
 
 ### Navigation & working directory (nwd)
 
